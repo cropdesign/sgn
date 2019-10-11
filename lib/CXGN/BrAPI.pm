@@ -25,6 +25,10 @@ use CXGN::BrAPI::v1::Results;
 use CXGN::BrAPI::v1::Images;
 use CXGN::BrAPI::v1::Markers;
 use CXGN::BrAPI::v1::Variables;
+use CXGN::BrAPI::v2::ObservationUnits;
+use CXGN::BrAPI::v2::Results;
+use CXGN::BrAPI::v2::Images;
+
 
 has 'version' => (
 	isa => 'Str',

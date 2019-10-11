@@ -2030,6 +2030,22 @@ sub observation_units_search_retrieve  : Chained('brapi') PathPart('search/obser
     retrieve_results($self, $c, $search_id, 'ObservationUnits');
 }
 
+sub studies_observations_v2 :  Chained('brapi') PathPart('observationunits') Args(0) ActionClass('REST') { }
+
+sub studies_observations_v2_PUT {
+    my $self = shift;
+    my $c = shift;
+    #my $clean_inputs = $c->stash->{clean_inputs};
+    #my $auth = _authenticate_user($c);
+    my $brapi = $self->brapi_module;
+    my $brapi_module = $brapi->brapi_wrapper('ObservationUnits');
+    my $brapi_package_result = $brapi_module->observationunits_store({
+        # study_id => $c->stash->{study_id}
+    });
+    _standard_response_construction($c, $brapi_package_result);
+}
+
+
 sub phenotypes_search_table : Chained('brapi') PathPart('phenotypes-search/table') Args(0) : ActionClass('REST') { }
 
 sub phenotypes_search_table_POST {
