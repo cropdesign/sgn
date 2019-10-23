@@ -34,6 +34,7 @@ sub search {
     my $folder_ids_arrayref = $params->{trialDbId} || ($params->{trialDbIds} || ());
     my $start_time = $params->{observationTimeStampRangeStart}->[0] || undef;
     my $end_time = $params->{observationTimeStampRangeEnd}->[0] || undef;
+    my $observation_unit_db_id = $params->{observationUnitDbId} || "";
 
     # not part of brapi standard yet
     # my $phenotype_min_value = $params->{phenotype_min_value};
@@ -156,11 +157,10 @@ sub search {
 
  sub observationunits_store {
     my $self = shift;
+    my $observation_unit_db_id = shift;
     my $params = shift;
-    my $image_dir = shift;
     my $user_id = shift;
     my $user_type = shift;
-    my $image_id = shift;
     my $page_size = $self->page_size;
     my $page = $self->page;
     my $status = $self->status;
@@ -175,53 +175,43 @@ sub search {
     my $trait_list_arrayref = $params->{observationVariableDbId} || ($params->{observationVariableDbIds} || ());
     my $program_ids_arrayref = $params->{programDbId} || ($params->{programDbIds} || ());
     my $folder_ids_arrayref = $params->{trialDbId} || ($params->{trialDbIds} || ());
-    my $start_time = $params->{observationTimeStampRangeStart}->[0] || undef;
-    my $end_time = $params->{observationTimeStampRangeEnd}->[0] || undef;
+    my $observationUnit_name = $params->{observationUnitName}->[0] || "";
+    my $observationUnit_position_arrayref = $params->{observationUnitPosition} || "";
+    my $observationUnit_x_ref = $params->{observationUnitXref} || "";
 
+    my $geo_coordinates = "";
+
+    foreach my $observationUnit_position (@$observationUnit_position_arrayref) {        
+        $geo_coordinates = $observationUnit_position->{geoCoordinates} || "";
+    }
+
+    my $geno_json_string = encode_json \%$geo_coordinates;
+
+    #update cvterm
     my $stock_geo_json_cvterm = SGN::Model::Cvterm->get_cvterm_row($schema, 'plot_geo_json', 'stock_property');
 
     my @parsed_data;
     push @parsed_data, {
-        5  => 3,
-        plot_stock_id => '38830'
+        plot_stock_id => $observation_unit_db_id,
     };
 
+    #sub upload coordinates
     my $upload_plot_gps_txn = sub {
+
         my %plot_stock_ids_hash;
         while (my ($key, $val) = each(@parsed_data)){
             $plot_stock_ids_hash{$val->{plot_stock_id}} = $val;
         }
-        print Dumper \%plot_stock_ids_hash;
 
         my @plot_stock_ids = keys %plot_stock_ids_hash;
 
         my $plots_rs = $schema->resultset("Stock::Stock")->search({stock_id => {-in=>\@plot_stock_ids}});
-      # print Dumper \$plots_rs->next;
+
         while (my $plot=$plots_rs->next){
-            my %geo_json = (
-                "type"=> "Feature",
-                "geometry"=> {
-                    "type"=> "Polygon",
-                    "coordinates"=> [
-                        [
-                            [1, 2],
-                            [3, 7],
-                            [4, 8],
-                            [5, 9],
-                            [6, 10111],
-                        ]
-                    ]
-                },
-                "properties"=> {
-                    "format"=> "WGS84",
-                }
-            );
-            my $geno_json_string = encode_json \%geo_json;
 
             my $previous_plot_gps_rs = $schema->resultset("Stock::Stockprop")->search({stock_id=>$plot->stock_id, type_id=>$stock_geo_json_cvterm->cvterm_id});
             $previous_plot_gps_rs->delete_all();
             $plot->create_stockprops({$stock_geo_json_cvterm->name() => $geno_json_string});
-              
         }
     };
 
@@ -233,10 +223,10 @@ sub search {
         # $c->detach();
     }
 
-    my %result = '';
+    my $result = '';
     my $total_count = 1;
     my $pagination = CXGN::BrAPI::Pagination->pagination_response($total_count,$page_size,$page);
-    return CXGN::BrAPI::JSONResponse->return_success(\%result, $pagination, undef, $status, 'Observation Units result constructed');
+    return CXGN::BrAPI::JSONResponse->return_success($result, $pagination, undef, $status, 'Observation Units result constructed');
 }
 
 
