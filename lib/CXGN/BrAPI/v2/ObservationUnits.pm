@@ -127,12 +127,11 @@ sub search {
             geoCoordinates => $geo_coordinates,
             positionCoordinateX => $obs_unit->{obsunit_col_number},
             positionCoordinateXType => '',
-            positionCoordinateX => $obs_unit->{obsunit_col_number},
+            positionCoordinateY => $obs_unit->{obsunit_row_number},
             positionCoordinateYType => '',
             replicate => $obs_unit->{obsunit_rep},
             };
 
-        
         push @data_window, {
             germplasmDbId => qq|$obs_unit->{germplasm_stock_id}|,
             germplasmName => $obs_unit->{germplasm_uniquename},
