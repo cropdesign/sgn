@@ -105,6 +105,8 @@ sub _clean_inputs {
 			push @$ret_val, $values;
 		} elsif (ref $values eq 'ARRAY'){
 			$ret_val = $values;
+        } elsif (ref $values eq 'HASH'){
+            $ret_val = [$values];
 		} else {
 			die "Input is not a scalar or an arrayref\n";
 		}

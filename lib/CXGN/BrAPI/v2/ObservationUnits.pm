@@ -12,6 +12,7 @@ use Try::Tiny;
 use CXGN::Phenotypes::PhenotypeMatrix;
 use CXGN::List::Transform;
 use JSON;
+use JSON::Parse ':all';
 
 
 extends 'CXGN::BrAPI::v2::Common';
@@ -109,7 +110,12 @@ sub search {
         while( my $r = $sp_rs->next()){
             $geolocation_lookup{$r->stock_id} = $r->value;
         }
-        my $geo_coordinates = $geolocation_lookup{$obs_unit->{observationunit_stock_id}} ?$geolocation_lookup{$obs_unit->{observationunit_stock_id}} : '';
+        my $geo_coordinates_string = $geolocation_lookup{$obs_unit->{observationunit_stock_id}} ?$geolocation_lookup{$obs_unit->{observationunit_stock_id}} : '';
+        my $geo_coordinates =''; 
+
+        if ($geo_coordinates_string){
+            $geo_coordinates = parse_json ($geo_coordinates_string);
+        } 
 
         my $entry_type = $obs_unit->{obsunit_is_a_control} ? 'check' : 'test';
 
@@ -185,7 +191,7 @@ sub search {
         $geo_coordinates = $observationUnit_position->{geoCoordinates} || "";
     }
 
-    my $geno_json_string = encode_json \%$geo_coordinates;
+    my $geno_json_string = encode_json $geo_coordinates;
 
     #update cvterm
     my $stock_geo_json_cvterm = SGN::Model::Cvterm->get_cvterm_row($schema, 'plot_geo_json', 'stock_property');
