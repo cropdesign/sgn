@@ -64,7 +64,8 @@ sub retrieve_results {
     my @data = \@{ $decoded_json->{result}->{data} } ;
 
     my ($data_window, $pagination) = CXGN::BrAPI::Pagination->paginate_array(@data,$page_size,$page);
-    return CXGN::BrAPI::JSONResponse->return_success($data_window, $pagination, \@data_files, $status, "search result constructed");
+    my %result = ( data => $data_window );
+    return CXGN::BrAPI::JSONResponse->return_success(\%result, $pagination, \@data_files, $status, "search result constructed");
 }
 
 1;
