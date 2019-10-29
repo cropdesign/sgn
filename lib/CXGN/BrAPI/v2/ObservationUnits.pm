@@ -62,7 +62,7 @@ sub search {
             accession_list=>$accession_ids_arrayref,
             folder_list=>$folder_ids_arrayref,
             program_list=>$program_ids_arrayref,
-            limit=>$limit,
+            # limit=>$limit,
             offset=>$offset,
             # phenotype_min_value=>$phenotype_min_value,
             # phenotype_max_value=>$phenotype_max_value,
@@ -119,8 +119,7 @@ sub search {
 
         my $entry_type = $obs_unit->{obsunit_is_a_control} ? 'check' : 'test';
 
-        my @brapi_observationUnitPosition;
-        push @brapi_observationUnitPosition, {
+        my %observationUnitPosition = ( 
             blockNumber => $obs_unit->{obsunit_block},       
             entryType => $entry_type,
             entryNumber => '',
@@ -129,8 +128,9 @@ sub search {
             positionCoordinateXType => '',
             positionCoordinateY => $obs_unit->{obsunit_row_number},
             positionCoordinateYType => '',
-            replicate => $obs_unit->{obsunit_rep},
-            };
+            replicate => $obs_unit->{obsunit_rep}
+        );
+        my $brapi_observationUnitPosition = parse_json(encode_json \%observationUnitPosition);
 
         push @data_window, {
             germplasmDbId => qq|$obs_unit->{germplasm_stock_id}|,
@@ -140,7 +140,7 @@ sub search {
             observationUnitDbId => qq|$obs_unit->{observationunit_stock_id}|,
             observationLevel => $obs_unit->{observationunit_type_name},
             observationUnitName => $obs_unit->{observationunit_uniquename},
-            observationUnitPosition => \@brapi_observationUnitPosition,
+            observationUnitPosition => $brapi_observationUnitPosition,
             observationUnitXref => '',
             programName => $obs_unit->{breeding_program_name},
             programDbId => $obs_unit->{breeding_program_id},
@@ -156,7 +156,7 @@ sub search {
     }
 
     my %result = (data=>\@data_window);
-    my $pagination = CXGN::BrAPI::Pagination->pagination_response($total_count,$page_size,$page);
+    my $pagination = CXGN::BrAPI::Pagination->pagination_response($total_count,$total_count,$page);
     return CXGN::BrAPI::JSONResponse->return_success(\%result, $pagination, \@data_files, $status, 'Observation Units search result constructed');
 }
 

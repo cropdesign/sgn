@@ -47,15 +47,24 @@ sub retrieve_results {
     my $self = shift;
     my $tempfiles_subdir = shift;
     my $search_id = shift;
+    my $page_size = $self->page_size;
+    my $page = $self->page;
+    my $status = $self->status;
     my $search_json;
+    my @data_files;
     my $filename = $tempfiles_subdir . "/" . $search_id;
 
     # check if file exists, if it does retrive and return contents
     if (-e $filename) {
         $search_json = read_file($filename) ;
     }
-    my $search_params = decode_json($search_json);
-    return $search_params;
+
+    #read data 
+    my $decoded_json = decode_json($search_json);
+    my @data = \@{ $decoded_json->{result}->{data} } ;
+
+    my ($data_window, $pagination) = CXGN::BrAPI::Pagination->paginate_array(@data,$page_size,$page);
+    return CXGN::BrAPI::JSONResponse->return_success($data_window, $pagination, \@data_files, $status, "search result constructed");
 }
 
 1;
