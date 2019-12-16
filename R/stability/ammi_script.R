@@ -42,54 +42,55 @@ write.table(drymater, file="drymater.txt", sep="\t")
 
 # print(pheno[,52])
 
-# library(agricolae)
+library(agricolae)
 
-# cat("Starting AMMI...","\n")
+cat("Starting AMMI...","\n")
 
-# sink("resultAMMI.txt")
-# pdf(file='AMMI_test.pdf')
+sink("newresultAMMI.txt")
+(file='newAMMI_test.pdf')
 
-# model<- with(X,AMMI(env, gen, rep, trait, console=FALSE))
-# cat("------------------------------------------------------------  ", "\n")
-# cat("Análise de Variância  ", "\n")
-# cat("------------------------------------------------------------  ", "\n")
-# cat("", "\n")
-# model$ANOVA
-
-# cat("------------------------------------------------------------  ", "\n")
-# cat("Variação explicada por componentes principais  ", "\n")
-# cat("------------------------------------------------------------  ", "\n")
-# model$analysis
-# cat("  ", "\n")
-
-# cat("------------------------------------------------------------  ", "\n")
-# cat("Médias dos Genótipos e Ambientes  ", "\n")
-# cat("------------------------------------------------------------  ", "\n")
-# cat("", "\n")
-# model$means
-# cat("", "\n")
-# cat("------------------------------------------------------------  ", "\n")
-# cat("Dados para análise gráfica  ", "\n")
-# cat("------------------------------------------------------------  ", "\n")
-# cat("", "\n")
-# model$biplot
-# cat("  ", "\n")
-# cat("  ", "\n")
+model<- with(pheno,AMMI(env, gen, rep, trait, console=FALSE))
+cat("------------------------------------------------------------  ", "\n")
+cat("Análise de Variância  ", "\n")
+cat("------------------------------------------------------------  ", "\n")
+cat("", "\n")
+model$ANOVA
 
 
-# # *******************************************************************
-# # 5. Saída gráfica
-# # *******************************************************************
-# # see help(plot.AMMI)
-# # biplot
+cat("------------------------------------------------------------  ", "\n")
+cat("Variação explicada por componentes principais  ", "\n")
+cat("------------------------------------------------------------  ", "\n")
+model$analysis
+cat("  ", "\n")
 
-# plot(model)
+cat("------------------------------------------------------------  ", "\n")
+cat("Médias dos Genótipos e Ambientes  ", "\n")
+cat("------------------------------------------------------------  ", "\n")
+cat("", "\n")
+model$means
+cat("", "\n")
+cat("------------------------------------------------------------  ", "\n")
+cat("Dados para análise gráfica  ", "\n")
+cat("------------------------------------------------------------  ", "\n")
+cat("", "\n")
+model$biplot
+cat("  ", "\n")
+cat("  ", "\n")
 
 
-# # triplot PC 1,2,3 
-# plot(model, type=2, number=TRUE)
-# # biplot PC1 vs Yield 
-# plot(model, first=0,second=1, number=TRUE)
+# *******************************************************************
+# 5. Saída gráfica
+# *******************************************************************
+# see help(plot.AMMI)
+# biplot
+
+plot(model)
+
+
+# triplot PC 1,2,3 
+plot(model, type=2, number=TRUE)
+# biplot PC1 vs Yield 
+plot(model, first=0,second=1, number=TRUE)
 
 
 # sink()
